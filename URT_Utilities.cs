@@ -33,7 +33,7 @@ namespace UniversalResourceTransferV2
                             Transmitters.Add(moduleValues);
 
                             TransmitterAreas.Add(Convert.ToString(moduleValues.GetValue("SourceArea")));
-                            TransmitterBeamedPowers.Add(Convert.ToString(moduleValues.GetValue("ReceivedPower")));
+                            TransmitterBeamedPowers.Add(Convert.ToString(moduleValues.GetValue("RecvPower")));
                             TransmitterTargets.Add(Convert.ToString(moduleValues.GetValue("Target")));
                             TransmitterWavelengths.Add(Convert.ToSingle(moduleValues.GetValue("Wavelength")));
                         }

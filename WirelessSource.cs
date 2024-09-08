@@ -1,10 +1,8 @@
 ﻿using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace UniversalResourceTransferV2
 {
@@ -73,7 +71,6 @@ namespace UniversalResourceTransferV2
         public void Start()
         {
 
-
             //Set basic variables to 0
             PowerToBeam = 100;
             RecvPower = 0;
@@ -92,10 +89,20 @@ namespace UniversalResourceTransferV2
             Target = receiverVessels[Counter];
             TargetName = Target.GetDisplayName();
 
-            receivedPower.CalcRecvPower(recvAreas[Counter], recvWavelengths[Counter], receiverEfficiencies[Counter],SourceArea,Wavelength,SourceEfficiency,PowerToBeam,this.part.vessel,Target,4.6,out isOccluded, out occluder, out RecvPower);
+            receivedPower.CalcRecvPower(
+                recvAreas[Counter], recvWavelengths[Counter], 
+                receiverEfficiencies[Counter],SourceArea,Wavelength,SourceEfficiency,
+                PowerToBeam,this.part.vessel,Target,4.6,out isOccluded,
+                out occluder, out RecvPower
+            );
             if (isOccluded)
             {
                 OccludingBodyName = occluder.GetDisplayName();
+                Fields["OccludingBodyName"].guiActive = true;
+            }
+            else
+            {
+                Fields["OccludingBodyName"].guiActive = false;
             }
         }
     }
