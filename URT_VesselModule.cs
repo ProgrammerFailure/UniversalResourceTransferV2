@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using Unity;
 using UnityEngine;
 namespace UniversalResourceTransferV2
@@ -33,12 +34,14 @@ namespace UniversalResourceTransferV2
         [KSPField(isPersistant = true)]
         double currentWavelength;
 
+        [KSPField(isPersistant = true)]
+        double TotalRecvPower;
+
         URT_Utilities Utility = new URT_Utilities();
         public void Start()
         {
-            
             LoadInternalReceiverData();
-            
+            Utility.LoadTransmitterData(this.Vessel,out TotalRecvPower);
         }
         
         //Compiles all the receivers on the vessel
@@ -87,7 +90,12 @@ namespace UniversalResourceTransferV2
         public void ReloadData()
         {
             LoadInternalReceiverData();
-            Utility.LoadTransmitterData();
+            Utility.LoadTransmitterData(this.vessel,out TotalRecvPower);
+        }
+
+        public void FixedUpdate()
+        {
+            this.vessel.RequestResource(this.vessel.rootPart, ResourceHashes[1], -TotalRecvPower * TimeWarp.fixedDeltaTime, true);
         }
     }
 }

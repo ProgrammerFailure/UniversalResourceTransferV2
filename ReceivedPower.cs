@@ -20,6 +20,8 @@ namespace UniversalResourceTransferV2
             double sourceArea,
             double sourceEfficiency,
             double powerBeamed,
+            double InitialBeamRadius,
+            double beamDivergence,
             //Vessels (for other info)
             Vessel sourceVessel,
             Vessel recvVessel,
@@ -39,10 +41,16 @@ namespace UniversalResourceTransferV2
             // Calculate distance
             double Distance = Vector3d.Distance(sourceVessel.GetWorldPos3D(), recvVessel.GetWorldPos3D());
 
-            // Calculate effective power density taking into account the inverse square law
-            double powerDensity = (powerBeamed * sourceArea) / (4 * Math.PI * Math.Pow(Distance,2));
+            //Apply wavelength effect to beam divergence
+            beamDivergence *= (sourceWavelength / (Math.PI * InitialBeamRadius));
 
-            // Apply wavelength falloff
+            //Calculate spot size
+            double beamSpotSize = (Distance * Math.Tan(beamDivergence)) + InitialBeamRadius;
+
+            // Calculate effective power density taking into account the inverse square law
+            double powerDensity = (powerBeamed * sourceArea) / (Math.PI*Math.Pow(beamSpotSize, 2));
+
+            //Calculate and apply wavelength mismatch falloff effect
             double wavelengthFalloffFactor = Math.Pow(Math.E, -wavelengthFalloff * (Math.Abs(recvWavelength - sourceWavelength) / recvWavelength));
             powerDensity *= wavelengthFalloffFactor;
 

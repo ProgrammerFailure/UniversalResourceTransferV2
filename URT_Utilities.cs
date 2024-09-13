@@ -2,22 +2,22 @@
 using KSP.Localization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace UniversalResourceTransferV2
 {
     internal class URT_Utilities
     {
-        public void LoadTransmitterData()
+        public double LoadTransmitterData(Vessel ReceiverVessel, out double TotalRecvPower)
         {
-            List<String> TransmitterAreas = new List<String>();
-            List<ConfigNode> Transmitters = new List<ConfigNode>();
-            List<String> TransmitterBeamedPowers = new List<String>();
+            List<int >TransmitterAreas = new List<int>();
+            List<Vessel> Transmitters = new List<Vessel>();
+            List<Double> TransmitterReceivedPowers = new List<Double>();
             List<String> TransmitterTargets = new List<String>();
             List<float> TransmitterWavelengths = new List<float>();
+            List<Guid> TargetIDs = new List<Guid>();
+            List<Vessel> TransmittersTargettingReceiver = new List<Vessel>();
+            TotalRecvPower = 0;
 
             List<float> ReceiverAreas = new List<float>();
             List<float> Receivers = new List<float>();   //Fill transmitter list
@@ -30,16 +30,27 @@ namespace UniversalResourceTransferV2
                         if (protoPartModuleSnapshot.moduleName == "WirelessSource")
                         {
                             ConfigNode moduleValues = protoPartModuleSnapshot.moduleValues;
-                            Transmitters.Add(moduleValues);
-
-                            TransmitterAreas.Add(Convert.ToString(moduleValues.GetValue("SourceArea")));
-                            TransmitterBeamedPowers.Add(Convert.ToString(moduleValues.GetValue("RecvPower")));
-                            TransmitterTargets.Add(Convert.ToString(moduleValues.GetValue("Target")));
-                            TransmitterWavelengths.Add(Convert.ToSingle(moduleValues.GetValue("Wavelength")));
+                            Guid guid = new Guid(moduleValues.GetValue("TargetID"));
+                            Transmitters.Add(v);
+                            TransmitterReceivedPowers.Add(Convert.ToDouble(moduleValues.GetValue("RecvPower")));
+                            TargetIDs.Add(guid);
                         }
                     }
                 }
             }
+            var i = 0;
+            foreach (Guid TargetID in TargetIDs)
+            {
+                i += 1;
+                if (TargetID == ReceiverVessel.id)
+                {
+                    TransmittersTargettingReceiver.Add(Transmitters[i]);
+                    TotalRecvPower += TransmitterReceivedPowers[i];
+                }
+            }
+
+            return TotalRecvPower;
+
         }
 
         public void LoadReceiverVessels(
